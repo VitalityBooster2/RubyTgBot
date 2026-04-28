@@ -63,7 +63,9 @@ GEM
     zeitwerk (2.7.5)
 
 PLATFORMS
+  unknown
   x64-mingw-ucrt
+  x86_64-linux
 
 DEPENDENCIES
   dotenv (~> 3.1)
