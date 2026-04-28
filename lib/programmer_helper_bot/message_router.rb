@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProgrammerHelperBot
   class MessageRouter
     def initialize(file_analyzer:, link_shortener:, python_sandbox:, youtube_downloader:)

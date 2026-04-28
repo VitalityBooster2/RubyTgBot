@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProgrammerHelperBot
   class FileAnalyzer
     PYTHON_IMPORT_REGEX = /^\s*(import\s+[\w.]+|from\s+[\w.]+\s+import\s+.+)\s*$/

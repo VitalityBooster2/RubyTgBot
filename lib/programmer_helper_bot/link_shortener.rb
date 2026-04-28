@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'uri'
 require 'net/http'
 
 module ProgrammerHelperBot
   class LinkShortener
-    API_URL = 'https://tinyurl.com/api-create.php'.freeze
+    API_URL = 'https://tinyurl.com/api-create.php'
 
     def shorten(url)
       validate_url!(url)

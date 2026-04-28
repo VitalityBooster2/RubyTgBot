@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProgrammerHelperBot
   class ChatStateService
     MENU_TO_MODE = {

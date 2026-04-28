@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ProgrammerHelperBot
   class ChatState
     attr_reader :mode
