@@ -1,0 +1,35 @@
+name: Ruby CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3'
+        bundler-cache: true
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 ffmpeg
+        pip3 install yt-dlp
+    
+    - name: Install Ruby gems
+      run: |
+        gem install minitest
+        gem install webmock
+        bundle install || true  # если есть Gemfile
+    
+    - name: Run tests
+      run: ruby -I test test/test_helper.rb test/*_test.rb
