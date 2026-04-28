@@ -20,15 +20,15 @@ module ProgrammerHelperBot
       return :menu_python if text.match?(/\A3(?:\b|[).:\-\s])/)
       return :menu_short_link if text.match?(/\A4(?:\b|[).:\-\s])/)
       return :help if text.match?(%r{\A/start\z}i)
-      return :python if text.downcase.start_with?("python ")
-      return :short_link if text.match?(/\A(?:shorten|short)\s+https?:\/\/\S+/i)
+      return :python if text.downcase.start_with?('python ')
+      return :short_link if text.match?(%r{\A(?:shorten|short)\s+https?://\S+}i)
       return :youtube if @youtube_downloader.youtube_url?(text)
 
       :help
     end
 
     def extract_python_code(text)
-      text.to_s.sub(/\Apython\s+/i, "")
+      text.to_s.sub(/\Apython\s+/i, '')
     end
 
     def extract_link(text)
@@ -39,13 +39,13 @@ module ProgrammerHelperBot
 
     def detect_by_mode(text, state)
       case state.mode
-      when "awaiting_youtube"
+      when 'awaiting_youtube'
         return :youtube if @youtube_downloader.youtube_url?(text)
-      when "awaiting_python"
+      when 'awaiting_python'
         return :python unless text.empty?
-      when "awaiting_short_link"
-        return :short_link if text.match?(/\Ahttps?:\/\/\S+/i)
-      when "awaiting_file"
+      when 'awaiting_short_link'
+        return :short_link if text.match?(%r{\Ahttps?://\S+}i)
+      when 'awaiting_file'
         return :help
       end
 

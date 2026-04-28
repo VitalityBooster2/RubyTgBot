@@ -1,5 +1,5 @@
-require "json"
-require "fileutils"
+require 'json'
+require 'fileutils'
 
 module ProgrammerHelperBot
   class FileStateRepository
@@ -23,7 +23,7 @@ module ProgrammerHelperBot
 
     def ensure_storage!
       directory = File.dirname(@path)
-      FileUtils.mkdir_p(directory) unless Dir.exist?(directory)
+      FileUtils.mkdir_p(directory)
       return if File.exist?(@path)
 
       write_store({})

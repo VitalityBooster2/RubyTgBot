@@ -1,28 +1,28 @@
-require "tmpdir"
-require "open3"
+require 'tmpdir'
+require 'open3'
 
 module ProgrammerHelperBot
   class YoutubeAudioDownloader
     MAX_DURATION_SECONDS = 10 * 60
-    YOUTUBE_REGEX = %r{(?:https?://)?(?:www\.)?(youtube\.com/watch\?v=|youtu\.be/)}i.freeze
+    YOUTUBE_REGEX = %r{(?:https?://)?(?:www\.)?(youtube\.com/watch\?v=|youtu\.be/)}i
 
     def youtube_url?(text)
       text.to_s.match?(YOUTUBE_REGEX)
     end
 
     def download_mp3(url)
-      raise ArgumentError, "Invalid YouTube URL" unless youtube_url?(url)
+      raise ArgumentError, 'Invalid YouTube URL' unless youtube_url?(url)
 
       ensure_duration_within_limit!(url)
-      Dir.mktmpdir("youtube_audio") do |dir|
-        output_pattern = File.join(dir, "audio.%(ext)s")
+      Dir.mktmpdir('youtube_audio') do |dir|
+        output_pattern = File.join(dir, 'audio.%(ext)s')
         command = [
-          "yt-dlp",
-          "--no-playlist",
-          "-x",
-          "--audio-format",
-          "mp3",
-          "-o",
+          'yt-dlp',
+          '--no-playlist',
+          '-x',
+          '--audio-format',
+          'mp3',
+          '-o',
           output_pattern,
           url
         ]
@@ -60,8 +60,8 @@ module ProgrammerHelperBot
           raise "yt-dlp failed: #{details}"
         end
 
-        mp3_files = Dir[File.join(dir, "*.mp3")]
-        raise "MP3 file was not produced" if mp3_files.empty?
+        mp3_files = Dir[File.join(dir, '*.mp3')]
+        raise 'MP3 file was not produced' if mp3_files.empty?
 
         File.binread(mp3_files.first)
       end
@@ -71,11 +71,11 @@ module ProgrammerHelperBot
 
     def ensure_duration_within_limit!(url)
       command = [
-        "yt-dlp",
-        "--no-playlist",
-        "--print",
-        "%(duration)s",
-        "--skip-download",
+        'yt-dlp',
+        '--no-playlist',
+        '--print',
+        '%(duration)s',
+        '--skip-download',
         url
       ]
       append_auth_options!(command)
@@ -90,12 +90,12 @@ module ProgrammerHelperBot
     end
 
     def safe_utf8(text)
-      text.to_s.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?")
+      text.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
     end
 
     def append_auth_options!(command)
-      cookies_file = ENV["YTDLP_COOKIES_FILE"].to_s.strip
-      cookies_from_browser = ENV["YTDLP_COOKIES_FROM_BROWSER"].to_s.strip
+      cookies_file = ENV['YTDLP_COOKIES_FILE'].to_s.strip
+      cookies_from_browser = ENV['YTDLP_COOKIES_FROM_BROWSER'].to_s.strip
 
       if !cookies_file.empty?
         if cookies_file.match?(%r{\A(?:[A-Za-z]:)?/?path/to/cookies\.txt\z}i)
@@ -107,9 +107,9 @@ module ProgrammerHelperBot
         end
         raise "Файл cookies не найден: #{cookies_file}" unless File.file?(cookies_file)
 
-        command.insert(-2, "--cookies", cookies_file)
+        command.insert(-2, '--cookies', cookies_file)
       elsif !cookies_from_browser.empty?
-        command.insert(-2, "--cookies-from-browser", cookies_from_browser)
+        command.insert(-2, '--cookies-from-browser', cookies_from_browser)
       end
     end
   end

@@ -1,9 +1,9 @@
-require "uri"
-require "net/http"
+require 'uri'
+require 'net/http'
 
 module ProgrammerHelperBot
   class LinkShortener
-    API_URL = "https://tinyurl.com/api-create.php".freeze
+    API_URL = 'https://tinyurl.com/api-create.php'.freeze
 
     def shorten(url)
       validate_url!(url)
@@ -21,9 +21,9 @@ module ProgrammerHelperBot
       parsed = URI.parse(url)
       return if parsed.is_a?(URI::HTTP) || parsed.is_a?(URI::HTTPS)
 
-      raise ArgumentError, "Invalid URL"
+      raise ArgumentError, 'Invalid URL'
     rescue URI::InvalidURIError
-      raise ArgumentError, "Invalid URL"
+      raise ArgumentError, 'Invalid URL'
     end
   end
 end

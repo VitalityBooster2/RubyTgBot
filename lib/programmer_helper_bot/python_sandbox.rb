@@ -1,5 +1,5 @@
-require "open3"
-require "timeout"
+require 'open3'
+require 'timeout'
 
 module ProgrammerHelperBot
   class PythonSandbox
@@ -15,7 +15,7 @@ module ProgrammerHelperBot
       status = nil
 
       Timeout.timeout(@timeout_seconds) do
-        output, error, status = Open3.capture3("python", "-I", "-S", "-c", code)
+        output, error, status = Open3.capture3('python', '-I', '-S', '-c', code)
       end
 
       {
@@ -26,8 +26,8 @@ module ProgrammerHelperBot
     rescue Timeout::Error
       {
         ok: false,
-        stdout: "",
-        stderr: "Execution timed out"
+        stdout: '',
+        stderr: 'Execution timed out'
       }
     end
   end

@@ -1,26 +1,26 @@
-require "dotenv/load"
-require "telegram/bot"
-require "open-uri"
-require "tempfile"
-require "net/http"
-require "uri"
-require_relative "lib/programmer_helper_bot/chat_state"
-require_relative "lib/programmer_helper_bot/file_state_repository"
-require_relative "lib/programmer_helper_bot/chat_state_service"
-require_relative "lib/programmer_helper_bot/file_analyzer"
-require_relative "lib/programmer_helper_bot/link_shortener"
-require_relative "lib/programmer_helper_bot/python_sandbox"
-require_relative "lib/programmer_helper_bot/youtube_audio_downloader"
-require_relative "lib/programmer_helper_bot/message_router"
+require 'dotenv/load'
+require 'telegram/bot'
+require 'open-uri'
+require 'tempfile'
+require 'net/http'
+require 'uri'
+require_relative 'lib/programmer_helper_bot/chat_state'
+require_relative 'lib/programmer_helper_bot/file_state_repository'
+require_relative 'lib/programmer_helper_bot/chat_state_service'
+require_relative 'lib/programmer_helper_bot/file_analyzer'
+require_relative 'lib/programmer_helper_bot/link_shortener'
+require_relative 'lib/programmer_helper_bot/python_sandbox'
+require_relative 'lib/programmer_helper_bot/youtube_audio_downloader'
+require_relative 'lib/programmer_helper_bot/message_router'
 
-token = ENV["TELEGRAM_BOT_TOKEN"]
-abort("Set TELEGRAM_BOT_TOKEN in environment or .env") if token.to_s.strip.empty?
+token = ENV.fetch('TELEGRAM_BOT_TOKEN', nil)
+abort('Set TELEGRAM_BOT_TOKEN in environment or .env') if token.to_s.strip.empty?
 
 analyzer = ProgrammerHelperBot::FileAnalyzer.new
 shortener = ProgrammerHelperBot::LinkShortener.new
 sandbox = ProgrammerHelperBot::PythonSandbox.new
 youtube = ProgrammerHelperBot::YoutubeAudioDownloader.new
-state_repository = ProgrammerHelperBot::FileStateRepository.new(path: File.join(__dir__, "tmp", "chat_states.json"))
+state_repository = ProgrammerHelperBot::FileStateRepository.new(path: File.join(__dir__, 'tmp', 'chat_states.json'))
 state_service = ProgrammerHelperBot::ChatStateService.new(repository: state_repository)
 router = ProgrammerHelperBot::MessageRouter.new(
   file_analyzer: analyzer,
@@ -45,8 +45,8 @@ TELEGRAM_HTTP_RETRIES = 3
 
 main_menu_markup = {
   keyboard: [
-    ["1) Анализ файла", "2) YouTube -> mp3"],
-    ["3) Выполнить Python", "4) Сократить ссылку"]
+    ['1) Анализ файла', '2) YouTube -> mp3'],
+    ['3) Выполнить Python', '4) Сократить ссылку']
   ],
   resize_keyboard: true,
   one_time_keyboard: false
@@ -56,19 +56,19 @@ Telegram::Bot::Client.run(token) do |bot|
   send_multipart_file = lambda do |chat_id:, endpoint:, field_name:, file_path:, filename:, content_type:, caption: nil, reply_markup: nil|
     boundary = "RubyBotBoundary#{rand(1_000_000_000)}"
     file_content = File.binread(file_path)
-    payload = +"".b
+    payload = +''.b
     payload << "--#{boundary}\r\n".b
     payload << "Content-Disposition: form-data; name=\"chat_id\"\r\n\r\n".b
     payload << "#{chat_id}\r\n".b
     if caption
       payload << "--#{boundary}\r\n".b
       payload << "Content-Disposition: form-data; name=\"caption\"\r\n\r\n".b
-      payload << "#{caption}\r\n".dup.force_encoding(Encoding::BINARY)
+      payload << "#{caption}\r\n".force_encoding(Encoding::BINARY)
     end
     if reply_markup
       payload << "--#{boundary}\r\n".b
       payload << "Content-Disposition: form-data; name=\"reply_markup\"\r\n\r\n".b
-      payload << "#{reply_markup}\r\n".dup.force_encoding(Encoding::BINARY)
+      payload << "#{reply_markup}\r\n".force_encoding(Encoding::BINARY)
     end
     payload << "--#{boundary}\r\n".b
     payload << "Content-Disposition: form-data; name=\"#{field_name}\"; filename=\"#{filename}\"\r\n".b
@@ -78,7 +78,7 @@ Telegram::Bot::Client.run(token) do |bot|
 
     uri = URI("https://api.telegram.org/bot#{token}/#{endpoint}")
     req = Net::HTTP::Post.new(uri)
-    req["Content-Type"] = "multipart/form-data; boundary=#{boundary}"
+    req['Content-Type'] = "multipart/form-data; boundary=#{boundary}"
     req.body = payload
     attempts = 0
 
@@ -109,23 +109,23 @@ Telegram::Bot::Client.run(token) do |bot|
     )
   end
 
-  send_output_with_fallback = lambda do |chat_id, text, filename_prefix: "output"|
+  send_output_with_fallback = lambda do |chat_id, text, filename_prefix: 'output'|
     if text.to_s.length <= MAX_TEXT_MESSAGE_LENGTH
       send_with_menu.call(chat_id, text)
       next
     end
 
-    Tempfile.create([filename_prefix, ".txt"]) do |f|
+    Tempfile.create([filename_prefix, '.txt']) do |f|
       f.write(text)
       f.rewind
       send_multipart_file.call(
         chat_id: chat_id,
-        endpoint: "sendDocument",
-        field_name: "document",
+        endpoint: 'sendDocument',
+        field_name: 'document',
         file_path: f.path,
         filename: "#{filename_prefix}.txt",
-        content_type: "text/plain",
-        caption: "Вывод слишком большой, отправляю файлом.",
+        content_type: 'text/plain',
+        caption: 'Вывод слишком большой, отправляю файлом.',
         reply_markup: main_menu_markup.to_json
       )
     end
@@ -142,21 +142,21 @@ Telegram::Bot::Client.run(token) do |bot|
 
       case action
       when :menu_file_stats
-        send_with_menu.call(chat_id, "Пришли .txt или .py файл документом, и я посчитаю строки, символы и импорты.")
+        send_with_menu.call(chat_id, 'Пришли .txt или .py файл документом, и я посчитаю строки, символы и импорты.')
 
       when :menu_youtube
-        send_with_menu.call(chat_id, "Отправь ссылку на YouTube (youtube.com или youtu.be), и я скачаю аудио в mp3.")
+        send_with_menu.call(chat_id, 'Отправь ссылку на YouTube (youtube.com или youtu.be), и я скачаю аудио в mp3.')
 
       when :menu_python
-        send_with_menu.call(chat_id, "Отправь Python-код. Пример: print(2+2)")
+        send_with_menu.call(chat_id, 'Отправь Python-код. Пример: print(2+2)')
 
       when :menu_short_link
-        send_with_menu.call(chat_id, "Отправь ссылку для сокращения. Пример: https://example.com")
+        send_with_menu.call(chat_id, 'Отправь ссылку для сокращения. Пример: https://example.com')
 
       when :file_stats
         doc = message.document
-        unless [".txt", ".py"].include?(File.extname(doc.file_name.to_s).downcase)
-          bot.api.send_message(chat_id: chat_id, text: "Поддерживаются только .txt и .py файлы.")
+        unless ['.txt', '.py'].include?(File.extname(doc.file_name.to_s).downcase)
+          bot.api.send_message(chat_id: chat_id, text: 'Поддерживаются только .txt и .py файлы.')
           next
         end
 
@@ -164,10 +164,10 @@ Telegram::Bot::Client.run(token) do |bot|
         file_path = if file_data.respond_to?(:file_path)
                       file_data.file_path
                     elsif file_data.respond_to?(:dig)
-                      file_data.dig("result", "file_path")
+                      file_data.dig('result', 'file_path')
                     end
         unless file_path
-          bot.api.send_message(chat_id: chat_id, text: "Не удалось получить файл.")
+          bot.api.send_message(chat_id: chat_id, text: 'Не удалось получить файл.')
           next
         end
 
@@ -183,19 +183,19 @@ Telegram::Bot::Client.run(token) do |bot|
         bot.api.send_message(chat_id: chat_id, text: response)
 
       when :youtube
-        bot.api.send_message(chat_id: chat_id, text: "Скачиваю аудио, подожди...")
+        bot.api.send_message(chat_id: chat_id, text: 'Скачиваю аудио, подожди...')
         binary = youtube.download_mp3(message.text.strip)
-        Tempfile.create(["youtube_audio", ".mp3"]) do |f|
+        Tempfile.create(['youtube_audio', '.mp3']) do |f|
           f.binmode
           f.write(binary)
           f.rewind
           send_multipart_file.call(
             chat_id: chat_id,
-            endpoint: "sendAudio",
-            field_name: "audio",
+            endpoint: 'sendAudio',
+            field_name: 'audio',
             file_path: f.path,
-            filename: "youtube_audio.mp3",
-            content_type: "audio/mpeg",
+            filename: 'youtube_audio.mp3',
+            content_type: 'audio/mpeg',
             reply_markup: main_menu_markup.to_json
           )
         end
@@ -204,11 +204,11 @@ Telegram::Bot::Client.run(token) do |bot|
         code = router.extract_python_code(message.text)
         result = sandbox.execute(code)
         text = if result[:ok]
-                 result[:stdout].empty? ? "(пустой вывод)" : result[:stdout]
+                 result[:stdout].empty? ? '(пустой вывод)' : result[:stdout]
                else
                  "Ошибка:\n#{result[:stderr]}"
                end
-        send_output_with_fallback.call(chat_id, text, filename_prefix: "python_output")
+        send_output_with_fallback.call(chat_id, text, filename_prefix: 'python_output')
 
       when :short_link
         raw_text = message.text.to_s

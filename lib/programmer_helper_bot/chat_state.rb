@@ -2,7 +2,7 @@ module ProgrammerHelperBot
   class ChatState
     attr_reader :mode
 
-    def initialize(mode: "idle")
+    def initialize(mode: 'idle')
       @mode = mode.to_s
     end
 
@@ -11,17 +11,17 @@ module ProgrammerHelperBot
     end
 
     def idle?
-      @mode == "idle"
+      @mode == 'idle'
     end
 
     def to_h
-      { "mode" => @mode }
+      { 'mode' => @mode }
     end
 
     def self.from_h(data)
       return new unless data.is_a?(Hash)
 
-      new(mode: data["mode"] || "idle")
+      new(mode: data['mode'] || 'idle')
     end
   end
 end
