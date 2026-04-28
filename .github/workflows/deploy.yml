@@ -2,9 +2,9 @@ name: Ruby CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ master ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ master ]
 
 jobs:
   test:
@@ -25,11 +25,16 @@ jobs:
         sudo apt-get install -y python3 ffmpeg
         pip3 install yt-dlp
     
-    - name: Install Ruby gems
-      run: |
-        gem install minitest
-        gem install webmock
-        bundle install || true  # если есть Gemfile
+    - name: Install dependencies
+      run: bundle install
     
     - name: Run tests
-      run: ruby -I test test/test_helper.rb test/*_test.rb
+      env:
+        CI: true
+      run: |
+        bundle exec ruby test/file_analyzer_test.rb
+        bundle exec ruby test/link_shortener_test.rb
+        bundle exec ruby test/message_router_test.rb
+        bundle exec ruby test/chat_state_service_test.rb
+        bundle exec ruby test/bot_flow_integration_test.rb
+        bundle exec ruby test/python_sandbox_test.rb
