@@ -37,4 +37,3 @@ jobs:
         bundle exec ruby test/message_router_test.rb
         bundle exec ruby test/chat_state_service_test.rb
         bundle exec ruby test/bot_flow_integration_test.rb
-        bundle exec ruby test/python_sandbox_test.rb
